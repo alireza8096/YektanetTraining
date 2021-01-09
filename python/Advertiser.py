@@ -1,4 +1,4 @@
-from main import BaseAdvertising
+from BaseAdvertising import BaseAdvertising
 
 
 class Advertiser(BaseAdvertising):
