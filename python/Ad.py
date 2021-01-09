@@ -1,4 +1,5 @@
 from main import BaseAdvertising
+from Advertiser import Advertiser
 
 
 class Add(BaseAdvertising):
@@ -12,6 +13,7 @@ class Add(BaseAdvertising):
     def inc_clicks(self):
         super().inc_clicks()
         self.__advertiser.inc_clicks()
+        Advertiser.inc_total_clicks()
 
     def inc_views(self):
         super().inc_views()
