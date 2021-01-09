@@ -1,5 +1,7 @@
 /out/
 /python/venv/
 /python/.idea/
-/python/__pychache__/
+python/__pycache__/
+/.idea/
+YektanetTraining.iml
 
