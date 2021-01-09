@@ -1,2 +1,5 @@
 /out/
 /python/venv/
+/python/.idea/
+/python/__pychache__/
+
