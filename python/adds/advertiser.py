@@ -1,4 +1,4 @@
-from base_advertising import BaseAdvertising
+from adds.base_advertising import BaseAdvertising
 
 
 class Advertiser(BaseAdvertising):
