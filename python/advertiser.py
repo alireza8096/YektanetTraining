@@ -1,12 +1,12 @@
-from BaseAdvertising import BaseAdvertising
+from base_advertising import BaseAdvertising
 
 
 class Advertiser(BaseAdvertising):
-    __total_clicks = 0
+    _total_clicks = 0
 
     def __init__(self, id, name):
         super().__init__(id)
-        self.__name = name
+        self._name = name
 
     @staticmethod
     def help():
@@ -16,16 +16,22 @@ class Advertiser(BaseAdvertising):
     def describe_me():
         return "I am advertiser class :)"
 
-    def get_name(self):
-        return self.__name
+    @property
+    def name(self):
+        return self._name
 
-    def set_name(self, name):
-        self.__name = name
+    @name.setter
+    def name(self, name):
+        self._name = name
+
+    @name.deleter
+    def name(self):
+        del self._name
 
     @staticmethod
     def get_total_clicks():
-        return Advertiser.__total_clicks
+        return Advertiser._total_clicks
 
     @staticmethod
     def inc_total_clicks():
-        Advertiser.__total_clicks += 1
+        Advertiser._total_clicks += 1

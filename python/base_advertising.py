@@ -1,21 +1,23 @@
 
 class BaseAdvertising:
     def __init__(self, id=-1):
-        self.__id = id
-        self.__clicks = 0
-        self.__views = 0
+        self._id = id
+        self._clicks = 0
+        self._views = 0
 
     def inc_views(self):
-        self.__views += 1
+        self._views += 1
 
     def inc_clicks(self):
-        self.__clicks += 1
+        self._clicks += 1
 
-    def get_clicks(self):
-        return self.__clicks
+    @property
+    def clicks(self):
+        return self._clicks
 
-    def get_views(self):
-        return self.__views
+    @property
+    def views(self):
+        return self._views
 
     @staticmethod
     def describe_me():

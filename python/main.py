@@ -1,6 +1,6 @@
-from Ad import Ad
-from Advertiser import Advertiser
-from BaseAdvertising import BaseAdvertising
+from ad import Ad
+from advertiser import Advertiser
+from base_advertising import BaseAdvertising
 
 baseAdvertising = BaseAdvertising()
 advertiser1 = Advertiser(1, 'name1')
@@ -18,10 +18,10 @@ ad2.inc_views()
 ad1.inc_clicks()
 ad1.inc_clicks()
 ad2.inc_clicks()
-print(advertiser2.get_name())
-advertiser2.set_name('new name')
-print(advertiser2.get_name())
-print(ad1.get_clicks())
-print(advertiser2.get_clicks())
+print(advertiser2.name)
+advertiser2.name = 'new_name'
+print(advertiser2.name)
+print(ad1.clicks)
+print(advertiser2.clicks)
 print(Advertiser.get_total_clicks())
 print(Advertiser.help())
