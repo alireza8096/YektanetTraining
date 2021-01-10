@@ -2,12 +2,10 @@ from adds.ad import Ad
 from adds.advertiser import Advertiser
 from adds.base_advertising import BaseAdvertising
 
-baseAdvertising = BaseAdvertising()
 advertiser1 = Advertiser(1, 'name1')
 advertiser2 = Advertiser(2, 'name2')
 ad1 = Ad(1, 'title1', 'image-url1', 'link1', advertiser1)
 ad2 = Ad(2, 'title2', 'image-url2', 'link2', advertiser2)
-print(baseAdvertising.describe_me())
 print(ad2.describe_me())
 print(advertiser1.describe_me())
 ad1.inc_views()

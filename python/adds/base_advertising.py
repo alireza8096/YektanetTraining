@@ -1,5 +1,7 @@
+from abc import ABC, abstractmethod
 
-class BaseAdvertising:
+
+class BaseAdvertising(ABC):
     def __init__(self, id=-1):
         self._id = id
         self._clicks = 0
@@ -19,8 +21,8 @@ class BaseAdvertising:
     def views(self):
         return self._views
 
-    @staticmethod
-    def describe_me():
-        return "I am BaseAdvertising class :)"
+    @abstractmethod
+    def describe_me(self):
+        pass
 
 
