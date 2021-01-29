@@ -31,13 +31,13 @@ def submit(request):
     advertiser_id = request.POST['advertiser_id']
     try:
         advertiser = Advertiser.objects.get(pk=advertiser_id)
-    except():
+    except(ValueError, KeyError, Advertiser.DoesNotExist):
         return render(request, 'advertiser_management/create_ad_form.html', {'error_message': 'Error! Invalid ID!'})
     image_url = request.POST['image_url']
     link = request.POST['link']
     title = request.POST['title']
-    if image_url is None or link is None or title is None:
-        return render(request, 'advertiser_management/create_ad_form.html', {'error_message': 'Error! Blank Input Is '
+    if image_url == '' or link == '' or title == '':
+        return render(request, 'advertiser_management/create_ad_form.html', {'error_message': 'Error! Blank Inputs Are '
                                                                                               'Invalid!'})
     ad = Ad(title=title, image_url=image_url, link=link, advertiser_id=advertiser_id)
     ad.save()

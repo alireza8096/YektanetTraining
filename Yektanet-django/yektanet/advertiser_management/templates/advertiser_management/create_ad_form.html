@@ -1,7 +1,7 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="http://127.0.0.1:8000/ads/submit/" method="post">
+<form action="{% url 'submit-ad' %}" method="post">
 {% csrf_token %}
 	<label>Advertiser id</label><br>
 	<input type="text" id="advertiser_id" name="advertiser_id"><br>
