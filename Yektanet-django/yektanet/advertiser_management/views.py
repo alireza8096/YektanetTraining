@@ -24,6 +24,7 @@ def inc_list_views(advertisers):
 
 
 def create_ad(request):
+    # Ad.objects.get(pk=11).delete()
     return render(request, 'advertiser_management/create_ad_form.html', {})
 
 
@@ -41,4 +42,4 @@ def submit(request):
                                                                                               'Invalid!'})
     ad = Ad(title=title, image_url=image_url, link=link, advertiser_id=advertiser_id)
     ad.save()
-    return redirect("http://127.0.0.1:8000/ads/")
+    return redirect("/ads/")
