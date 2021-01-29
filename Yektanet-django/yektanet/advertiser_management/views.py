@@ -26,3 +26,18 @@ def inc_list_views(advertisers):
     for advertiser in advertisers:
         for ad in advertiser.ad_set.all():
             ad.inc_views()
+
+
+def create_ad(request):
+    return render(request, 'advertiser_management/create_ad_form.html', {})
+
+
+def submit(request):
+    # todo : Error handling
+    advertiser_id = request.POST['advertiser_id']
+    image_url = request.POST['image_url']
+    link = request.POST['link']
+    title = request.POST['title']
+    ad = Ad(title=title, image_url=image_url, link=link, advertiser_id=advertiser_id)
+    ad.save()
+    return redirect("http://127.0.0.1:8000/ads/")

@@ -1,0 +1,16 @@
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form action="http://127.0.0.1:8000/ads/submit/" method="post">
+{% csrf_token %}
+	<label>Advertiser id</label><br>
+	<input type="text" id="advertiser_id" name="advertiser_id"><br>
+	<label>Image</label><br>
+	<input type="text" id="image_url" name="image_url"><br>
+	<label>Title</label><br>
+	<input type="text" id="title" name="title"><br>
+	<label>Link</label><br>
+	<input type="text" id="link" name="link">
+
+<input type="submit" value="Vote">
+</form>
