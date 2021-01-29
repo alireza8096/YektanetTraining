@@ -6,8 +6,10 @@ from django.template import loader
 
 
 def ads_index(request):
-    # todo : inc views
     advertisers = Advertiser.objects.all()
+    for advertiser in advertisers:
+        for ad in advertiser.ad_set.all():
+            ad.inc_views()
     template = loader.get_template('advertiser_management/ads.html')
     context = {
         'advertisers': advertisers
