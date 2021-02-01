@@ -3,25 +3,29 @@ from django.shortcuts import render, redirect
 from .models import Advertiser
 from .models import Ad
 from django.template import loader
+from django.utils import timezone
 
 
 def ads_index(request):
     advertisers = Advertiser.objects.all()
-    inc_list_views(advertisers)
+    create_views_objects(advertisers, request)
     return render(request, 'advertiser_management/ads.html', {'advertisers': advertisers})
 
 
 def click_ad(request, ad_id):
     ad = Ad.objects.get(pk=ad_id)
-    # ad.inc_clicks()
+    ad.click_set.create(ip=request.session['user_ip'], time=timezone.now())
+    # print(ad.click_set.all())
     return redirect(ad.link)
 
 
-def inc_list_views(advertisers):
+def create_views_objects(advertisers, request):
+    user_ip = request.session['user_ip']
+    time = timezone.now()
     for advertiser in advertisers:
         for ad in advertiser.ad_set.all():
-            pass
-            # ad.inc_views()
+            ad.view_set.create(ip=user_ip, time=time)
+            # print(ad.view_set.all())
 
 
 def create_ad(request):
