@@ -13,18 +13,18 @@ def ads_index(request):
 
 def click_ad(request, ad_id):
     ad = Ad.objects.get(pk=ad_id)
-    ad.inc_clicks()
+    # ad.inc_clicks()
     return redirect(ad.link)
 
 
 def inc_list_views(advertisers):
     for advertiser in advertisers:
         for ad in advertiser.ad_set.all():
-            ad.inc_views()
+            pass
+            # ad.inc_views()
 
 
 def create_ad(request):
-    # Ad.objects.get(pk=11).delete()
     return render(request, 'advertiser_management/create_ad_form.html', {})
 
 
