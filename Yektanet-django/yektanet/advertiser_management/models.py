@@ -16,6 +16,7 @@ class Ad(models.Model):
     image_url = models.CharField(max_length=100)
     link = models.CharField(max_length=100)
     advertiser = models.ForeignKey(Advertiser, on_delete=models.CASCADE)
+    approved = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
