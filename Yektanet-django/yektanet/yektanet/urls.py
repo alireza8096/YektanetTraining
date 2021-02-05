@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ads/', include('advertiser_management.urls')),
     path('click/', include('advertiser_management.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
