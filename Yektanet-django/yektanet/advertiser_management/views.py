@@ -2,16 +2,19 @@ from django.db.models import Count
 from django.db.models.functions import TruncHour
 from django.forms import models
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.views.generic import TemplateView
-from rest_framework.renderers import JSONRenderer
+from django.views.generic import TemplateView, RedirectView
+from rest_framework.generics import ListAPIView
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
+from rest_framework.response import Response
+
 from .models import Advertiser
 from .models import Ad, Click
 from .models import View as ModelView
 from django.template import loader
 from django.utils import timezone
-from .serializers import AdSerializer
+from .serializers import AdSerializer, AdvertiserSerializer
 
 
 class StatsView(TemplateView):
@@ -27,11 +30,20 @@ class StatsView(TemplateView):
         return context
 
 
-class AdsIndexView(View):
-    def get(self, request):
-        advertisers = Advertiser.objects.all()
-        self.create_views_objects(advertisers, request)
-        return render(request, 'advertiser_management/ads.html', {'advertisers': advertisers})
+class AdsIndexView(ListAPIView):
+    template_name = 'advertiser_management/ads.html'
+    serializer_class = AdvertiserSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+    queryset = Advertiser.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        self.create_views_objects(self.get_queryset(), request)
+        return Response({'advertisers': self.get_queryset()})
+
+    # def get(self, request):
+    #     advertisers = Advertiser.objects.all()
+    #     self.create_views_objects(advertisers, request)
+    #     return render(request, 'advertiser_management/ads.html', {'advertisers': advertisers})
 
     def create_views_objects(self, advertisers, request):
         user_ip = request.session['user_ip']
@@ -39,15 +51,14 @@ class AdsIndexView(View):
         for advertiser in advertisers:
             for ad in advertiser.ad_set.all():
                 ad.view_set.create(ip=user_ip, time=time)
-                # print(ad.view_set.all())
 
 
-class AdClickView(View):
-    def get(self, request, ad_id):
-        ad = Ad.objects.get(pk=ad_id)
-        ad.click_set.create(ip=request.session['user_ip'], time=timezone.now())
-        print(ad_id)
-        return redirect(ad.link)
+class AdClickView(RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        ad = get_object_or_404(Ad, id=kwargs['ad_id'])
+        ad.click_set.create(ip=self.request.session['user_ip'], time=timezone.now())
+        return ad.link
 
 
 class CreateAdView(View):
