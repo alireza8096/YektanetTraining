@@ -5,9 +5,13 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import TemplateView, RedirectView
-from rest_framework.generics import ListAPIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+
 
 from .models import Advertiser
 from .models import Ad, Click
@@ -19,6 +23,8 @@ from .serializers import AdSerializer, AdvertiserSerializer
 
 class StatsView(TemplateView):
     template_name = 'advertiser_management/stats.html'
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -30,6 +36,14 @@ class StatsView(TemplateView):
         return context
 
 
+def create_views_objects(advertisers, request):
+    user_ip = request.session['user_ip']
+    time = timezone.now()
+    for advertiser in advertisers:
+        for ad in advertiser.ad_set.all():
+            ad.view_set.create(ip=user_ip, time=time)
+
+
 class AdsIndexView(ListAPIView):
     template_name = 'advertiser_management/ads.html'
     serializer_class = AdvertiserSerializer
@@ -37,20 +51,8 @@ class AdsIndexView(ListAPIView):
     queryset = Advertiser.objects.all()
 
     def get(self, request, *args, **kwargs):
-        self.create_views_objects(self.get_queryset(), request)
+        create_views_objects(self.get_queryset(), request)
         return Response({'advertisers': self.get_queryset()})
-
-    # def get(self, request):
-    #     advertisers = Advertiser.objects.all()
-    #     self.create_views_objects(advertisers, request)
-    #     return render(request, 'advertiser_management/ads.html', {'advertisers': advertisers})
-
-    def create_views_objects(self, advertisers, request):
-        user_ip = request.session['user_ip']
-        time = timezone.now()
-        for advertiser in advertisers:
-            for ad in advertiser.ad_set.all():
-                ad.view_set.create(ip=user_ip, time=time)
 
 
 class AdClickView(RedirectView):
@@ -62,11 +64,15 @@ class AdClickView(RedirectView):
 
 
 class CreateAdView(View):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         return render(request, 'advertiser_management/create_ad_form.html', {})
 
 
 class SubmitAdView(View):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         advertiser_id = request.POST['advertiser_id']
         try:
@@ -92,8 +98,10 @@ def get_number_of_clicks_or_views_per_hour_with_id(model):
 
 def get_delta_view_and_click(click_id):
     click = Click.objects.get(pk=click_id)
-    view = ModelView.objects.filter(ip=click.ip, ad_id=click.ad_id, time__lt=click.time).order_by('-time')[0]
-    return click.time - view.time
+    print(click.ad_id)
+    views = ModelView.objects.filter(ip=click.ip, ad_id=click.ad_id, time__lt=click.time).order_by('-time')
+    print(views)
+    return click.time - views[0].time
 
 
 def get_average_delta_click_and_time():
@@ -129,3 +137,34 @@ def get_click_per_view_rate_per_hour():
             final_list.append({'date': time['hour_and_date'], 'rate': rate})
     print(final_list)
     return final_list
+
+
+class AdViewSet(ModelViewSet):
+    serializer_class = AdSerializer
+    queryset = Ad.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        serializer = AdSerializer(self.get_queryset(), many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        queryset.create(request.data)
+
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        ad = get_object_or_404(self.get_queryset(), pk=pk)
+        serializer = AdSerializer(ad)
+        return Response(serializer.data)
+
+    def get_permissions(self):
+        if self.action == 'list':
+            permission_classes = [AllowAny]
+        if self.action == 'create':
+            permission_classes = [IsAdminUser]
+        if self.action == 'retrieve':
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [AllowAny]
+        return [permission() for permission in permission_classes]
+
+
