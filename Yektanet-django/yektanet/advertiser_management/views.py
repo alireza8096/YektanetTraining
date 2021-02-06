@@ -10,8 +10,8 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpda
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-
 
 from .models import Advertiser
 from .models import Ad, Click
@@ -21,19 +21,19 @@ from django.utils import timezone
 from .serializers import AdSerializer, AdvertiserSerializer
 
 
-class StatsView(TemplateView):
+class StatsView(ListAPIView):
     template_name = 'advertiser_management/stats.html'
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
+    renderer_classes = [TemplateHTMLRenderer]
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['click_sum'] = list(get_number_of_clicks_or_views_per_hour_with_id(Click))
-        context['view_sum'] = list(get_number_of_clicks_or_views_per_hour_with_id(ModelView))
-        context['total_click_per_view'] = Click.objects.count() / ModelView.objects.count()
-        context['average_delta_click_and_view'] = get_average_delta_click_and_time()
-        context['click_per_view_rate_per_hour'] = get_click_per_view_rate_per_hour()
-        return context
+    def get(self, request, *args, **kwargs):
+        context = {'click_sum': list(get_number_of_clicks_or_views_per_hour_with_id(Click)),
+                   'view_sum': list(get_number_of_clicks_or_views_per_hour_with_id(ModelView)),
+                   'total_click_per_view': Click.objects.count() / ModelView.objects.count(),
+                   'average_delta_click_and_view': get_average_delta_click_and_time(),
+                   'click_per_view_rate_per_hour': get_click_per_view_rate_per_hour()}
+        return Response(context)
 
 
 def create_views_objects(advertisers, request):
@@ -63,11 +63,13 @@ class AdClickView(RedirectView):
         return ad.link
 
 
-class CreateAdView(View):
-    permission_classes = [IsAuthenticated]
+class CreateAdView(ListAPIView):
+    template_name = 'advertiser_management/create_ad_form.html'
+    serializer_class = AdvertiserSerializer
+    renderer_classes = [TemplateHTMLRenderer]
 
-    def get(self, request):
-        return render(request, 'advertiser_management/create_ad_form.html', {})
+    def get(self, request, *args, **kwargs):
+        return Response({})
 
 
 class SubmitAdView(View):
@@ -166,5 +168,3 @@ class AdViewSet(ModelViewSet):
         else:
             permission_classes = [AllowAny]
         return [permission() for permission in permission_classes]
-
-
