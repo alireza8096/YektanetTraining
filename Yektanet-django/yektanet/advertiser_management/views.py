@@ -25,7 +25,7 @@ class StatsView(ListAPIView):
     template_name = 'advertiser_management/stats.html'
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    renderer_classes = [TemplateHTMLRenderer]
+    # renderer_classes = [TemplateHTMLRenderer]
 
     def get(self, request, *args, **kwargs):
         context = {'click_sum': list(get_number_of_clicks_or_views_per_hour_with_id(Click)),
