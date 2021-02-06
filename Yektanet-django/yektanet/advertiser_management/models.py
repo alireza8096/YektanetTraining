@@ -40,6 +40,13 @@ class View(models.Model):
     ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
 
 
+class HourReport(models.Model):
+    date = models.DateTimeField()
+    clicks = models.IntegerField()
+    views = models.IntegerField()
+    ad = models.ForeignKey(Ad, on_delete=models.CASCADE)
+
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
